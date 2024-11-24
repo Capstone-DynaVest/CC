@@ -1,9 +1,9 @@
 
-# Ignore .env files
+
 .env
 
-# Ignore node_modules
+
 node_modules/
 
-# Ignore service account json file
+
 service-account.json
