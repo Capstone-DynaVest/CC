@@ -9,6 +9,8 @@ key = process.env.JWT_KEY;
 
 
 
+
+
 const registerEmail = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -52,6 +54,7 @@ const registerEmail = async (req, res) => {
         res.status(200).json({
             success: true,
             message: "User registered successfully",
+            email: email,
             create_at: userData.createAt,
             token: token
         });
@@ -65,7 +68,6 @@ const registerEmail = async (req, res) => {
         });
     }
 };
-
 
 const loginEmail = async (req, res) => {
     try {
@@ -104,8 +106,9 @@ const loginEmail = async (req, res) => {
         };
 
         const token = jwt.sign(payload, key, {
-            expiresIn: "1h"
+            expiresIn: "24h"
         });
+        
 
         setSessionUser(req, { email });
 
@@ -136,7 +139,7 @@ const logoutUser = (req, res) => {
                     });
                 }
 
-                res.clearCookie("connect.sid");
+                res.clearCookie("connect.sid"); 
                 return res.status(200).json({
                     success: true,
                     message: "Logged out successfully",
@@ -156,6 +159,7 @@ const logoutUser = (req, res) => {
         });
     }
 };
+
 
 module.exports = {
     registerEmail,
