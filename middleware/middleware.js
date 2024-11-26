@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
  key = process.env.JWT_KEY;
+ console.log("Key:", key);
 
 const sessionMiddleware = session({
     secret: process.env.SESSION_SECRET,
