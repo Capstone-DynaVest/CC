@@ -4,18 +4,18 @@ const bcrypt = require("bcrypt");
 const { setSessionUser } = require("../middleware/middleware");
 require("dotenv").config();
 
-// Mendapatkan JWT_KEY dari variabel lingkungan dan memberikan fallback jika tidak ada
-const key = process.env.JWT_KEY || 'defaultSecretKey'; // Default jika key tidak ada
+
+const key = process.env.JWT_KEY || 'defaultSecretKey'; 
 if (!process.env.JWT_KEY) {
     console.warn("WARNING: JWT_KEY is not defined. Using default secret key.");
 }
 
-// Fungsi untuk mendaftar user
+
 const registerEmail = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Validasi input
+       
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
@@ -23,7 +23,7 @@ const registerEmail = async (req, res) => {
             });
         }
 
-        // Mengecek apakah user sudah ada
+        
         const userRef = db.collection("users").doc(email);
         const user = await userRef.get();
 
@@ -34,10 +34,10 @@ const registerEmail = async (req, res) => {
             });
         }
 
-        // Meng-hash password
+     
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Menyimpan data user
+        
         const userData = {
             email: email,
             password: hashedPassword,
@@ -46,12 +46,12 @@ const registerEmail = async (req, res) => {
 
         await userRef.set(userData);
 
-        // Payload untuk JWT
+      
         const payload = {
             email: email
         };
 
-        // Memastikan key JWT ada sebelum membuat token
+      
         if (!key) {
             return res.status(500).json({
                 success: false,
@@ -59,7 +59,7 @@ const registerEmail = async (req, res) => {
             });
         }
 
-        // Membuat JWT token
+      
         const token = jwt.sign(payload, key, {
             expiresIn: "1h"
         });
@@ -82,7 +82,6 @@ const registerEmail = async (req, res) => {
     }
 };
 
-// Fungsi untuk login user
 const loginEmail = async (req, res) => {
     try {
         const { email, password } = req.body;
