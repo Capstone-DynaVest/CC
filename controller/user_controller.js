@@ -5,14 +5,17 @@ const { setSessionUser } = require("../middleware/middleware");
 require("dotenv").config();
 
 
-key = process.env.JWT_KEY;
-
+const key = process.env.JWT_KEY || 'defaultSecretKey'; 
+if (!process.env.JWT_KEY) {
+    console.warn("WARNING: JWT_KEY is not defined. Using default secret key.");
+}
 
 
 const registerEmail = async (req, res) => {
     try {
         const { email, password } = req.body;
 
+       
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
@@ -20,6 +23,7 @@ const registerEmail = async (req, res) => {
             });
         }
 
+        
         const userRef = db.collection("users").doc(email);
         const user = await userRef.get();
 
@@ -30,9 +34,10 @@ const registerEmail = async (req, res) => {
             });
         }
 
-
+     
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        
         const userData = {
             email: email,
             password: hashedPassword,
@@ -41,10 +46,20 @@ const registerEmail = async (req, res) => {
 
         await userRef.set(userData);
 
+      
         const payload = {
             email: email
         };
 
+      
+        if (!key) {
+            return res.status(500).json({
+                success: false,
+                message: "JWT key is not defined"
+            });
+        }
+
+      
         const token = jwt.sign(payload, key, {
             expiresIn: "1h"
         });
@@ -52,6 +67,7 @@ const registerEmail = async (req, res) => {
         res.status(200).json({
             success: true,
             message: "User registered successfully",
+            email: email,
             create_at: userData.createAt,
             token: token
         });
@@ -66,11 +82,11 @@ const registerEmail = async (req, res) => {
     }
 };
 
-
 const loginEmail = async (req, res) => {
     try {
         const { email, password } = req.body;
 
+      
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
@@ -78,6 +94,7 @@ const loginEmail = async (req, res) => {
             });
         }
 
+     
         const userRef = db.collection("users").doc(email);
         const user = await userRef.get();
 
@@ -90,7 +107,7 @@ const loginEmail = async (req, res) => {
 
         const userData = user.data();
 
-
+     
         const isMatch = await bcrypt.compare(password, userData.password);
         if (!isMatch) {
             return res.status(401).json({
@@ -99,14 +116,17 @@ const loginEmail = async (req, res) => {
             });
         }
 
+       
         const payload = {
             email: email
         };
 
+        
         const token = jwt.sign(payload, key, {
-            expiresIn: "1h"
+            expiresIn: "24h"
         });
 
+        
         setSessionUser(req, { email });
 
         res.status(200).json({
@@ -125,6 +145,7 @@ const loginEmail = async (req, res) => {
     }
 };
 
+
 const logoutUser = (req, res) => {
     try {
         if (req.session) {
@@ -136,7 +157,7 @@ const logoutUser = (req, res) => {
                     });
                 }
 
-                res.clearCookie("connect.sid");
+                res.clearCookie("connect.sid"); 
                 return res.status(200).json({
                     success: true,
                     message: "Logged out successfully",
