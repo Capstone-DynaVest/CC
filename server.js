@@ -2,6 +2,7 @@ const express = require("express");
 const db = require("./firebaseClient");
 const { sessionMiddleware } = require("./middleware/middleware");
 const userRoute = require("./routes/user_routes");
+const moduleRoute = require("./routes/module_routes");
 const cors = require("cors");
 const swaggerjsdoc = require("swagger-jsdoc");
 const swaggerui = require("swagger-ui-express");
@@ -18,6 +19,7 @@ app.use(sessionMiddleware);
 
 
 app.use("/users", userRoute);
+app.use("/modules", moduleRoute);
 
 const spacs = swaggerjsdoc({
     definition: {
@@ -32,7 +34,8 @@ const spacs = swaggerjsdoc({
             },
         ],
     },
-    apis: ["./routes/user_routes.js"], 
+    apis: ["./routes/user_routes.js", "./routes/module_routes.js"], 
+
 });
 
 app.use("/api-docs", swaggerui.serve, swaggerui.setup(spacs));
