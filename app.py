@@ -91,6 +91,73 @@ def get_historical_prices(symbol, days=20):
 
 @app.route('/login', methods=['POST'])
 def login():
+    """
+    Login pengguna.
+    ---
+    tags:
+      - Authentication
+    parameters:
+      - in: body
+        name: body
+        description: Data login pengguna.
+        required: true
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+              example: "user@example.com"
+            password:
+              type: string
+              example: "password123"
+    responses:
+      200:
+        description: Login berhasil.
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "login successful"
+            access_token:
+              type: string
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            email:
+              type: string
+              example: "user@example.com"
+      400:
+        description: Input tidak valid.
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: "Invalid input. Please provide 'email' and 'password'."
+      404:
+        description: Pengguna tidak ditemukan.
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: "User not found"
+      401:
+        description: Kata sandi salah.
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: "Invalid password"
+      500:
+        description: Terjadi kesalahan.
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: "An unexpected error occurred."
+    """
     try:
         data = request.get_json()
         email = data.get('email')
@@ -102,13 +169,11 @@ def login():
         doc_ref = db.collection('users').document(email)
         doc = doc_ref.get()
 
-        if not doc.exists:
-            print(f"User not found: {email}")
+        if not doc.exists():
             return jsonify({'error': 'User not found'}), 404
 
         user_data = doc.to_dict()
         if not check_password_hash(user_data['password'], password):
-            print("Password mismatch")
             return jsonify({'error': 'Invalid password'}), 401
 
         session['user_email'] = email
@@ -116,12 +181,68 @@ def login():
         return jsonify({"message": "login successful", 'access_token': access_token, 'email': email}), 200
 
     except Exception as e:
-        print(f"Error during login: {e}")
         return jsonify({'error': str(e)}), 500
+
 
 
 @app.route('/register', methods=['POST'])
 def register():
+    """
+    Registrasi pengguna baru.
+    ---
+    tags:
+      - Authentication
+    parameters:
+      - in: body
+        name: body
+        description: Data registrasi pengguna.
+        required: true
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+              example: "user@example.com"
+            password:
+              type: string
+              example: "password123"
+    responses:
+      201:
+        description: Registrasi berhasil.
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "User registered successfully"
+            email:
+              type: string
+              example: "user@example.com"
+      400:
+        description: Input tidak valid.
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: "Invalid input. Please provide 'email' and 'password'."
+      409:
+        description: Pengguna sudah terdaftar.
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: "User already exists"
+      500:
+        description: Terjadi kesalahan.
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: "An unexpected error occurred."
+    """
     try:
         data = request.get_json()
         email = data.get('email')
@@ -133,24 +254,17 @@ def register():
         doc_ref = db.collection('users').document(email)
         doc = doc_ref.get()
 
-        if doc.exists:
+        if doc.exists():
             return jsonify({'error': 'User already exists'}), 409
 
         hashed_password = generate_password_hash(password)
-
-        # Tambahkan log untuk debugging
-        print(f"Saving user: {email}")
-        
-        doc_ref.set({
-            'email': email,
-            'password': hashed_password
-        })
+        doc_ref.set({'email': email, 'password': hashed_password})
 
         return jsonify({'message': 'User registered successfully', 'email': email}), 201
 
     except Exception as e:
-        print(f"Error during registration: {e}")
         return jsonify({'error': str(e)}), 500
+
 
 
 @app.route('/predictStock', methods=['POST'])
@@ -287,6 +401,7 @@ def get_modules():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
 @app.route('/logout', methods=['POST'])
 @jwt_required()
 def logout():
@@ -304,6 +419,7 @@ def logout():
         return jsonify({"message": "Logout successful"}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
 @app.route('/protected', methods=['GET'])
 @jwt_required()
 def protected_route():
