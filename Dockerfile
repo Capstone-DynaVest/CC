@@ -3,10 +3,22 @@ FROM python:3.10-slim
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
-ENV GOOGLE_APPLICATION_CREDENTIALS="/serpis.json"  # Ensure the path aligns with the WORKDIR
+ENV GOOGLE_APPLICATION_CREDENTIALS="/app/serpis.json"  # Ensure the path aligns with the WORKDIR
 
 # Set the working directory in the container
 WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        gcc \
+        g++ \
+        curl \
+        libglib2.0-0 \
+        libsm6 \
+        libxext6 \
+        libxrender-dev \
+    && pip install --upgrade pip
 
 # Copy the requirements file into the container
 COPY requirements.txt /app/
