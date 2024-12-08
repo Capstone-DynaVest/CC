@@ -1,0 +1,22 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/capstone-c242-ps555/dynavest'
+      - '.'
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'dynavest'
+      - '--image'
+      - 'gcr.io/capstone-c242-ps555/dynavest'
+      - '--platform'
+      - 'managed'
+      - '--region'
+      - 'asia-southeast1'
+      - '--allow-unauthenticated'
+images:
+  - 'gcr.io/capstone-c242-ps555/dynavest'
