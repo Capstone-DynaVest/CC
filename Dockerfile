@@ -3,7 +3,7 @@ FROM python:3.10-slim
 
 
 ENV PYTHONUNBUFFERED=1
-ENV GOOGLE_APPLICATION_CREDENTIALS="/app/serpis.json"  # Ensure the path aligns with the WORKDIR
+ENV GOOGLE_APPLICATION_CREDENTIALS="/app/serpis.json"  
 
 
 WORKDIR /app
