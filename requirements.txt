@@ -1,0 +1,9 @@
+Flask==2.3.2
+flask-jwt-extended==4.4.4
+werkzeug==2.3.5
+google-cloud-firestore==2.7.0
+tensorflow==2.13.0
+flask-cors==3.2.2
+python-dotenv==1.0.0
+yfinance==0.2.22
+flasgger==0.9.5
