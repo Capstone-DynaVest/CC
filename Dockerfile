@@ -8,7 +8,7 @@ ENV GOOGLE_APPLICATION_CREDENTIALS="/app/serpis.json"  # Ensure the path aligns 
 # Set the working directory in the container
 WORKDIR /app
 
-# Install system dependencies and Python dependencies
+# Install system dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         gcc \
@@ -20,15 +20,11 @@ RUN apt-get update \
         libxrender-dev \
     && pip install --upgrade pip
 
-# Install Python libraries (using a multi-line approach for readability)
-RUN pip install tensorflow==2.13.0 \
-    flasgger \
-    flask \
-    flask-jwt-extended \
-    werkzeug \
-    google-cloud-firestore \
-    python-dotenv \
-    yfinance
+# Copy the requirements file into the container
+COPY requirements.txt /app/
+
+# Install Python dependencies
+RUN pip install -r requirements.txt
 
 # Copy the application source code into the container
 COPY . /app/
@@ -37,7 +33,7 @@ COPY . /app/
 RUN chmod +x /app/app.py
 
 # Expose the port that Flask will run on
-EXPOSE 5000
+EXPOSE 4000
 
 # Set the default command to run your app
 CMD ["python", "app.py"]
