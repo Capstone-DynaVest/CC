@@ -27,11 +27,17 @@ RUN pip install virtualenv
 RUN python -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
 
-# Copy the requirements file into the container
-COPY requirements.txt /app/
-
-# Install Python dependencies inside the virtual environment
-RUN pip install -r requirements.txt
+# Install Python dependencies
+RUN pip install \
+    Flask==2.3.2 \
+    flask-jwt-extended==4.4.4 \
+    werkzeug==2.3.5 \
+    google-cloud-firestore==2.7.0 \
+    tensorflow==2.13.0 \
+    flask-cors \
+    python-dotenv==1.0.0 \
+    yfinance==0.2.22 \
+    flasgger==0.9.5
 
 # Copy the application source code into the container
 COPY . /app/
