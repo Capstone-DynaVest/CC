@@ -46,7 +46,7 @@ COPY . /app/
 RUN chmod +x /app/app.py
 
 # Expose the port that Flask will run on
-EXPOSE 4000
+EXPOSE 8080
 
 # Set the default command to run your app
 CMD ["python", "app.py"]
